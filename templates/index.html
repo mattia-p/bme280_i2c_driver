@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temperature Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Temperature Readings</h1>
+    <table>
+        <tr>
+            <th>Timestamp</th>
+            <th>Temperature (°C)</th>
+        </tr>
+        {% for timestamp, temperature in temperature_data %}
+        <tr>
+            <td>{{ timestamp }}</td>
+            <td>{{ temperature }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

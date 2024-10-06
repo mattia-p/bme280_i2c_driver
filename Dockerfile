@@ -8,12 +8,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     sudo \
     python3 \
-    python2-pip \
+    python3-pip \
     i2c-tools
+
+RUN pip3 install Flask
     
 
 # Set working directory
 WORKDIR /app
 
 # Copy your source code
-COPY src/ .
+COPY . .
