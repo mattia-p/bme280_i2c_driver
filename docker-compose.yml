@@ -1,0 +1,15 @@
+version: "1"
+
+services:
+  cpp-dev:
+    image: bme280:latest
+    network_mode: "host" # ?
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    build: .
+    environment:
+      - DISPLAY=${DISPLAY}
+    volumes:
+      - ./:/app:rw  # Mount your local src folder  
+      - /tmp/.X11-unix:/tmp/.X11-unix # for GUI purposes
+    privileged: true # to give root capability on all devices
