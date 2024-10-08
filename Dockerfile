@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     i2c-tools
 
 RUN pip3 install Flask
+RUN pip3 install plotly
     
 
 # Set working directory
