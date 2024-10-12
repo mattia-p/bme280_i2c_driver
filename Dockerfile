@@ -9,7 +9,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     sudo \
     python3 \
     python3-pip \
-    i2c-tools
+    i2c-tools \
+    cmake \
+    g++ \
+    build-essential
 
 RUN pip3 install Flask
 RUN pip3 install plotly
