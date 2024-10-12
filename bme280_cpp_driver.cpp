@@ -89,27 +89,36 @@ void BME280::writeRegister(uint8_t reg, uint8_t value){
     }
 }
 
-float BME280::compensateTemperature(int32_t rawTemp){
-    int32_t var1;
-    int32_t var2;
+float BME280::compensateTemperature(int32_t rawTemp) {
+    int32_t var1, var2;
     int32_t t_fine;
 
-    uint16_t dig_T1 = read16(0x88);
-    int16_t dig_T2 = (int16_t)read16(0x8A);
-    int16_t dig_T3 = (int16_t)read16(0x8C);
+    // Read the calibration data (unsigned and signed as per datasheet)
+    uint16_t dig_T1 = read16(0x88);             // Unsigned 16-bit
+    int16_t dig_T2, dig_T3;
+    dig_T2 = (int16_t)read16(0x8A);     // Signed 16-bit
+    dig_T3 = (int16_t)read16(0x8C);     // Signed 16-bit
 
+    // Debug print calibration values
     std::cout << "Calibration data: dig_T1 = " << dig_T1 
               << ", dig_T2 = " << dig_T2 << ", dig_T3 = " << dig_T3 << std::endl;
 
-    // Compensation formula
-    var1 = ((((rawTemp >> 3) - (dig_T1 << 1))) * dig_T2) >> 11;
-    var2 = (((((rawTemp >> 4) - dig_T1) * ((rawTemp >> 4) - dig_T1)) >> 12) * dig_T3) >> 14;
+    // Apply compensation formula - ADD EXPLICIT CASTS TO INT32_T TO HANDLE SIGNED/UNSIGNED CORRECTLY
+    var1 = ((((int32_t)rawTemp >> 3) - ((int32_t)dig_T1 << 1)) * (int32_t)dig_T2) >> 11;
+    var2 = ((((((int32_t)rawTemp >> 4) - (int32_t)dig_T1) * 
+            ((int32_t)rawTemp >> 4) - (int32_t)dig_T1) >> 12) * (int32_t)dig_T3) >> 14;
 
     t_fine = var1 + var2;
+
+    // Debug print intermediate values
+    std::cout << "var1: " << var1 << " var2: " << var2 << " t_fine: " << t_fine << std::endl;
+
+    // Calculate temperature (same as Python)
     float temperature = (t_fine * 5 + 128) >> 8;
 
     return temperature / 100.0;
 }
+
 
 uint8_t BME280::readRegister(uint8_t reg){
     // reg: register address from which we want to read a byte
@@ -138,7 +147,7 @@ uint16_t BME280::read16(uint8_t reg){
         std::cerr << "Failed to read from the register\n";
     }
 
-    return (buffer[0] << 8 | buffer[1]);
+    return (buffer[1] << 8 | buffer[0]);
 
 }
 
