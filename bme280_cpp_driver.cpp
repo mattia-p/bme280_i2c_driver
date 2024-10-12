@@ -4,6 +4,7 @@
 #include <sys/ioctl.h> // ioctl, IO control
 #include <linux/i2c-dev.h> // I2c 
 #include <cstdint> // For uint_8_t ...
+#include <sstream> // For std::ostringstream
 
 // BME280 default I2C address
 #define BME280_ADDRESS 0x77
@@ -39,6 +40,7 @@ private:
 BME280::BME280(const char* i2cDevice, uint8_t address) : i2cAddress(address){
     
     // Open i2c bus
+    std::cout << "Open I2C bus" << std::endl;
     i2cFile = open(i2cDevice, O_RDWR); // O_RDWR (open for reading and writing)
     if (i2cFile < 0)
     {
@@ -47,27 +49,35 @@ BME280::BME280(const char* i2cDevice, uint8_t address) : i2cAddress(address){
     }
 
     // Set the i2c slave address
+    std::cout << "Set i2c slave address" << std::endl;
     if (ioctl(i2cFile, I2C_SLAVE, i2cAddress) < 0) // I/O control. 
     {
         std::cerr << "Failed to acquire bus access or talk to the BME280\n";
         exit(1);
     }
+
 }
-
-
 
 bool BME280::begin(){
     // Configure the BME280 sensor
-    writeRegister(BME280_REG_CTRL_HUM, 0x01);  // Humidity oversampling x1
-    writeRegister(BME280_REG_CTRL_MEAS, 0x27); // Normal mode, oversampling x1 for temperature
-    writeRegister(BME280_REG_CONFIG, 0xA0); // Set config (filter off, standby)
+    std::cout << "BME280 config" << std::endl;
 
+    try {
+        writeRegister(BME280_REG_CTRL_HUM, 0x01);  // Humidity oversampling x1
+        writeRegister(BME280_REG_CTRL_MEAS, 0x27); // Normal mode, oversampling x1 for temperature
+        writeRegister(BME280_REG_CONFIG, 0xA0); // Set config (filter off, standby)
+    }catch(const std::exception& e){
+        std::cerr << "Caught an exception: " << e.what() << std::endl;
+        exit(1);
+    }
+
+    std::cout << "End of BME280 config" << std::endl;
 
     return true;
 }
 
 float BME280::readTemperature(){
-    // 
+
     int32_t rawTemp = readRawTemperature();
 
     // Compensate the temperature using the formula and calibration values
@@ -85,7 +95,13 @@ void BME280::writeRegister(uint8_t reg, uint8_t value){
     //
     uint8_t buffer[2] = {reg, value};
     if (write(i2cFile, buffer, 2) != 2){
-        std::cerr << "Failed to write to the registers\n";
+        
+        std::ostringstream oss;
+        oss << "Failed to write to register 0x"
+            << std::hex << static_cast<int>(reg)
+            << " with value 0x" << std::hex << static_cast<int>(value) << ".";
+
+        throw std::runtime_error(oss.str());
     }
 }
 
@@ -100,8 +116,8 @@ float BME280::compensateTemperature(int32_t rawTemp) {
     dig_T3 = (int16_t)read16(0x8C);     // Signed 16-bit
 
     // Debug print calibration values
-    std::cout << "Calibration data: dig_T1 = " << dig_T1 
-              << ", dig_T2 = " << dig_T2 << ", dig_T3 = " << dig_T3 << std::endl;
+    // std::cout << "Calibration data: dig_T1 = " << dig_T1 
+    //           << ", dig_T2 = " << dig_T2 << ", dig_T3 = " << dig_T3 << std::endl;
 
     // Apply compensation formula - ADD EXPLICIT CASTS TO INT32_T TO HANDLE SIGNED/UNSIGNED CORRECTLY
     var1 = ((((int32_t)rawTemp >> 3) - ((int32_t)dig_T1 << 1)) * (int32_t)dig_T2) >> 11;
@@ -111,14 +127,13 @@ float BME280::compensateTemperature(int32_t rawTemp) {
     t_fine = var1 + var2;
 
     // Debug print intermediate values
-    std::cout << "var1: " << var1 << " var2: " << var2 << " t_fine: " << t_fine << std::endl;
+    // std::cout << "var1: " << var1 << " var2: " << var2 << " t_fine: " << t_fine << std::endl;
 
     // Calculate temperature (same as Python)
     float temperature = (t_fine * 5 + 128) >> 8;
 
     return temperature / 100.0;
 }
-
 
 uint8_t BME280::readRegister(uint8_t reg){
     // reg: register address from which we want to read a byte
@@ -164,7 +179,6 @@ uint32_t BME280::read20(uint8_t reg){
 
     return (buffer[0] << 16 | buffer[1] << 8 | buffer[2]);
 }
-
 
 int main()
 {
