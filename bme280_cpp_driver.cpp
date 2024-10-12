@@ -12,6 +12,7 @@
 #define BME280_REG_TEMP_MSB 0xFA
 #define BME280_REG_TEMP_LSB 0xFB
 #define BME280_REG_TEMP_XLSB 0xFC
+#define BME280_REG_CTRL_HUM 0xF2
 #define BME280_REG_CTRL_MEAS 0xF4
 #define BME280_REG_CONFIG 0xF5
 
@@ -57,8 +58,10 @@ BME280::BME280(const char* i2cDevice, uint8_t address) : i2cAddress(address){
 
 bool BME280::begin(){
     // Configure the BME280 sensor
+    writeRegister(BME280_REG_CTRL_HUM, 0x01);  // Humidity oversampling x1
     writeRegister(BME280_REG_CTRL_MEAS, 0x27); // Normal mode, oversampling x1 for temperature
     writeRegister(BME280_REG_CONFIG, 0xA0); // Set config (filter off, standby)
+
 
     return true;
 }
@@ -87,13 +90,16 @@ void BME280::writeRegister(uint8_t reg, uint8_t value){
 }
 
 float BME280::compensateTemperature(int32_t rawTemp){
-    int32_t var1, var2;
+    int32_t var1;
+    int32_t var2;
     int32_t t_fine;
 
-    uint16_t dig_T1 = read16(0x88);             // Unsigned 16-bit
-    int16_t dig_T2 = (int16_t)read16(0x8A);     // Signed 16-bit
-    int16_t dig_T3 = (int16_t)read16(0x8C);     // Signed 16-bit
+    uint16_t dig_T1 = read16(0x88);
+    int16_t dig_T2 = (int16_t)read16(0x8A);
+    int16_t dig_T3 = (int16_t)read16(0x8C);
 
+    std::cout << "Calibration data: dig_T1 = " << dig_T1 
+              << ", dig_T2 = " << dig_T2 << ", dig_T3 = " << dig_T3 << std::endl;
 
     // Compensation formula
     var1 = ((((rawTemp >> 3) - (dig_T1 << 1))) * dig_T2) >> 11;
