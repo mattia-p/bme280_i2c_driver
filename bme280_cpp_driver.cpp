@@ -6,7 +6,7 @@
 #include <cstdint> // For uint_8_t ...
 
 // BME280 default I2C address
-#define BME280_ADDRESS 0x76
+#define BME280_ADDRESS 0x77
 
 // BME280 Registers
 #define BME280_REG_TEMP_MSB 0xFA
@@ -32,6 +32,7 @@ private:
     uint8_t readRegister(uint8_t reg);
     uint16_t read16(uint8_t reg);
     uint32_t read20(uint8_t reg);
+    float compensateTemperature(int32_t rawTemp);
 };
 
 BME280::BME280(const char* i2cDevice, uint8_t address) : i2cAddress(address){
@@ -66,9 +67,9 @@ float BME280::readTemperature(){
     // 
     int32_t rawTemp = readRawTemperature();
 
-    // Convert to celcius
-    float temp = rawTemp / 5120.0;
-    return temp;
+    // Compensate the temperature using the formula and calibration values
+    
+    return compensateTemperature(rawTemp);
 }
 
 int32_t BME280::readRawTemperature(){
@@ -83,6 +84,25 @@ void BME280::writeRegister(uint8_t reg, uint8_t value){
     if (write(i2cFile, buffer, 2) != 2){
         std::cerr << "Failed to write to the registers\n";
     }
+}
+
+float BME280::compensateTemperature(int32_t rawTemp){
+    int32_t var1, var2;
+    int32_t t_fine;
+
+    uint16_t dig_T1 = read16(0x88);             // Unsigned 16-bit
+    int16_t dig_T2 = (int16_t)read16(0x8A);     // Signed 16-bit
+    int16_t dig_T3 = (int16_t)read16(0x8C);     // Signed 16-bit
+
+
+    // Compensation formula
+    var1 = ((((rawTemp >> 3) - (dig_T1 << 1))) * dig_T2) >> 11;
+    var2 = (((((rawTemp >> 4) - dig_T1) * ((rawTemp >> 4) - dig_T1)) >> 12) * dig_T3) >> 14;
+
+    t_fine = var1 + var2;
+    float temperature = (t_fine * 5 + 128) >> 8;
+
+    return temperature / 100.0;
 }
 
 uint8_t BME280::readRegister(uint8_t reg){
