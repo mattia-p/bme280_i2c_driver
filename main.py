@@ -1,6 +1,10 @@
+import os
+import struct
 import time
 from i2c_driver.bme280 import BME280I2CDriver
 from db_handler import init_db, save_temperature_to_db
+
+PIPE_NAME = "/tmp/sensor_pipe"
 
 def log_temperature(bme280):
     """TODO"""
@@ -26,5 +30,31 @@ def main():
         log_temperature(bme280)
         time.sleep(5)
 
+def main_cpp():
+
+    # Initialize the database
+    init_db()
+
+    print('main cpp')
+
+    with open(PIPE_NAME, 'rb') as pipe: # Blocking if no process has opened the pipe in write mode (O_WRONLY)
+        print("Opened pipe for reading")
+
+        try:
+            while True:
+                # Read the temperature data (float is 4 bytes)
+                data = pipe.read(4)
+                if not data:
+                    break
+
+                temperature = struct.unpack('f', data)[0]
+                print(f"Received temperature: {temperature:.2f} °C")
+
+                save_temperature_to_db(temperature)
+        
+        except KeyboardInterrupt:
+            print('Process interrupted.')
+
 if __name__ == "__main__":
-    main()
+    # main()
+    main_cpp()

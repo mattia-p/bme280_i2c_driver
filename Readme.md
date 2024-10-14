@@ -11,7 +11,9 @@
 - CMake
 - Memory management/handling
 - C++ version, separate data registers and calibration registers
-
+- Pi mini with ubuntu server?
+- Add humidity and pressure
+- Add tests
 
 ## Instructions
 
