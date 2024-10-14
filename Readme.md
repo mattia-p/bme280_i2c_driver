@@ -14,6 +14,7 @@
 - Pi mini with ubuntu server?
 - Add humidity and pressure
 - Add tests
+- Handle UTC time in database
 
 ## Instructions
 
@@ -26,4 +27,21 @@ sudo i2cdetect -y 1
 
 ```bash
 g++ -o cpp_driver bme280_cpp_driver.cpp
+```
+
+## Start
+
+Start the C++ i2c driver
+```bash
+./cpp_driver
+```
+
+Start the python main file:
+```bash
+python3 main.py
+```
+
+Start the flask app:
+```bash
+python3 flask_web_app.py
 ```

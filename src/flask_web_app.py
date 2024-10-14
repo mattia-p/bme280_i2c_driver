@@ -2,13 +2,14 @@ from flask import Flask, render_template
 import sqlite3
 import plotly.graph_objs as go
 import plotly.io as pio
+import os
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder=os.path.join(os.path.dirname(__file__), '../templates'))
 
 def get_temperature_data():
     """Fetch the latest temperature data from the database"""
 
-    conn = sqlite3.connect('sensor_data.db')
+    conn = sqlite3.connect('database/sensor_data.db')
     c = conn.cursor()
     c.execute("SELECT timestamp, temperature FROM temperature_log")
 

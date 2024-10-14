@@ -1,7 +1,7 @@
 import os
 import struct
 import time
-from i2c_driver.bme280 import BME280I2CDriver
+from python_driver.bme280 import BME280I2CDriver
 from db_handler import init_db, save_temperature_to_db
 
 PIPE_NAME = "/tmp/sensor_pipe"
