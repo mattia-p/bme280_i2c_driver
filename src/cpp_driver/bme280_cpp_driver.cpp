@@ -60,7 +60,6 @@ BME280::BME280(const char* i2cDevice, uint8_t address) : i2cAddress(address){
         std::cerr << "Failed to acquire bus access or talk to the BME280\n";
         exit(1);
     }
-
 }
 
 bool BME280::begin(){
@@ -120,19 +119,12 @@ float BME280::compensateTemperature(int32_t rawTemp) {
     dig_T2 = (int16_t)read16(0x8A);     // Signed 16-bit
     dig_T3 = (int16_t)read16(0x8C);     // Signed 16-bit
 
-    // Debug print calibration values
-    // std::cout << "Calibration data: dig_T1 = " << dig_T1 
-    //           << ", dig_T2 = " << dig_T2 << ", dig_T3 = " << dig_T3 << std::endl;
-
     // Apply compensation formula - ADD EXPLICIT CASTS TO INT32_T TO HANDLE SIGNED/UNSIGNED CORRECTLY
     var1 = ((((int32_t)rawTemp >> 3) - ((int32_t)dig_T1 << 1)) * (int32_t)dig_T2) >> 11;
     var2 = ((((((int32_t)rawTemp >> 4) - (int32_t)dig_T1) * 
             ((int32_t)rawTemp >> 4) - (int32_t)dig_T1) >> 12) * (int32_t)dig_T3) >> 14;
 
     t_fine = var1 + var2;
-
-    // Debug print intermediate values
-    // std::cout << "var1: " << var1 << " var2: " << var2 << " t_fine: " << t_fine << std::endl;
 
     // Calculate temperature (same as Python)
     float temperature = (t_fine * 5 + 128) >> 8;

@@ -7,7 +7,9 @@ import datetime
 DATABASE_PATH = os.path.join(os.path.dirname(__file__), '../database/sensor_data.db')
 
 def init_db():
-    """Initializes the SQLite database and creates the table"""
+    """
+    Initializes the SQLite database and creates the table
+    """
 
     conn = sqlite3.connect(DATABASE_PATH)
 
@@ -22,7 +24,9 @@ def init_db():
     conn.close()
 
 def save_temperature_to_db(temperature):
-    """Inserts temperature data into the SQLite database"""
+    """
+    Inserts temperature data into the SQLite database
+    """
 
     conn = sqlite3.connect(DATABASE_PATH)
     c = conn.cursor()

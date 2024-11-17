@@ -8,7 +8,9 @@ app = Flask(__name__, template_folder=os.path.join(os.path.dirname(__file__), '.
 DATABASE_PATH = os.path.join(os.path.dirname(__file__), '../database/sensor_data.db')
 
 def get_temperature_data():
-    """Fetch the latest temperature data from the database"""
+    """
+    Fetch the latest temperature data from the database
+    """
 
     conn = sqlite3.connect(DATABASE_PATH)
     c = conn.cursor()
@@ -26,7 +28,9 @@ def get_temperature_data():
 
 @app.route('/')
 def index():
-    """Render the dashboard"""
+    """
+    Render the dashboard
+    """
     timestamps, temperatures = get_temperature_data()
 
     # Create a Plotly line graph
