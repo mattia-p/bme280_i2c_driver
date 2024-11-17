@@ -7,13 +7,13 @@ Scan the i2c bus to know the address of the devices connected to it.
 sudo i2cdetect -y 1
 ```
 
-## Build
+### Build
 
 ```bash
 g++ -o cpp_driver bme280_cpp_driver.cpp
 ```
 
-## Start
+### Start
 
 Start the C++ i2c driver
 ```bash
@@ -30,7 +30,7 @@ Start the flask app:
 python3 flask_web_app.py
 ```
 
-## Run and stop all scripts at the same time
+### Run and stop all scripts at the same time
 
 To start all scripts at once:
 ```bash
@@ -48,7 +48,6 @@ pkill -p < start_script_pid >
 ```
 
 ## Improvements
-
 - Turn off sensor in between measurements?
 - Measure power consumption?
 - Error handling (sensor now found ...)
@@ -61,3 +60,8 @@ pkill -p < start_script_pid >
 - Add tests
 - Handle UTC time in database
 - Add logging and remove print statements
+- Add diagram
+
+## Result example
+
+![](assets/temperature_app.png)

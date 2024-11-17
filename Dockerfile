@@ -19,7 +19,6 @@ RUN pip3 install plotly
 RUN pip3 install --no-cache-dir smbus2
 RUN pip3 install --no-cache-dir pytz
     
-
 # Set working directory
 WORKDIR /app
 

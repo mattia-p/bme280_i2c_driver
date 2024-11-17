@@ -3,7 +3,7 @@ version: "1"
 services:
   cpp-dev:
     image: bme280:latest
-    network_mode: "host" # ?
+    network_mode: "host"
     stdin_open: true # docker run -i
     tty: true        # docker run -t
     build: .
