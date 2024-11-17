@@ -1,6 +1,8 @@
 import sqlite3
 import time
 import os
+import pytz
+import datetime
 
 DATABASE_PATH = os.path.join(os.path.dirname(__file__), '../database/sensor_data.db')
 
@@ -24,7 +26,15 @@ def save_temperature_to_db(temperature):
 
     conn = sqlite3.connect(DATABASE_PATH)
     c = conn.cursor()
-    timestamp = time.strftime('%Y-%m-%d %H:%M:%S')  # Current timestamp
+
+    # Define timezone
+    pst_timezone = pytz.timezone('America/Los_Angeles')
+
+    # Get current time in specified timezone
+    current_time = datetime.datetime.now(pst_timezone)
+
+    # Format timestamp as string
+    timestamp = current_time.strftime('%Y-%m-%d %H:%M:%S')
 
     c.execute("INSERT INTO temperature_log (timestamp, temperature) VALUES (?, ?)", 
               (timestamp, temperature))

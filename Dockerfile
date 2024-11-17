@@ -17,6 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN pip3 install Flask
 RUN pip3 install plotly
 RUN pip3 install --no-cache-dir smbus2
+RUN pip3 install --no-cache-dir pytz
     
 
 # Set working directory

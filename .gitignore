@@ -4,3 +4,6 @@ __pycache__/
 
 # Database files
 *.db
+
+# C++ executable
+cpp_driver

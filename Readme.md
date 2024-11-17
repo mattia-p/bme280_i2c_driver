@@ -1,21 +1,5 @@
 # BME280 driver
 
-## Improvements
-
-- Turn off sensor in between measurements?
-- Measure power consumption?
-- c++ driver
-- IPC driver <> rest of app
-- Error handling (sensor now found ...)
-- Formatting (clang...)
-- CMake
-- Memory management/handling
-- C++ version, separate data registers and calibration registers
-- Pi mini with ubuntu server?
-- Add humidity and pressure
-- Add tests
-- Handle UTC time in database
-
 ## Instructions
 
 Scan the i2c bus to know the address of the devices connected to it. 
@@ -45,3 +29,35 @@ Start the flask app:
 ```bash
 python3 flask_web_app.py
 ```
+
+## Run and stop all scripts at the same time
+
+To start all scripts at once:
+```bash
+./start.sh
+```
+
+Find PID of start.sh:
+```bash
+ps -a
+```
+
+To kill all child processes at once:
+```bash
+pkill -p < start_script_pid >
+```
+
+## Improvements
+
+- Turn off sensor in between measurements?
+- Measure power consumption?
+- Error handling (sensor now found ...)
+- Formatting (clang...)
+- CMake instead of g++
+- Memory management/handling
+- C++ version, separate data registers and calibration registers
+- Pi mini with ubuntu server?
+- Add humidity and pressure
+- Add tests
+- Handle UTC time in database
+- Add logging and remove print statements
