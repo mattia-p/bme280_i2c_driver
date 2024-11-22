@@ -7,3 +7,6 @@
 
 # C++ executable
 cpp_driver
+
+# Bazel output folder
+bazel-*

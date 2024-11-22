@@ -1,6 +1,5 @@
 FROM ubuntu:22.04
 
-# Otherwise libsdl2-dev gets stuck at asking geographical region
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Update package lists
@@ -12,7 +11,24 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     i2c-tools \
     cmake \
     g++ \
-    build-essential
+    build-essential \
+    curl \
+    software-properties-common \
+    gnupg \
+    apt-transport-https && \
+    apt-get clean
+
+# Install Bazelisk for ARM architecture
+RUN ARCH=$(uname -m) && \
+    if [ "$ARCH" = "x86_64" ]; then \
+        curl -LO https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64; \
+    elif [ "$ARCH" = "aarch64" ]; then \
+        curl -LO https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-arm64; \
+    else \
+        echo "Unsupported architecture: $ARCH" && exit 1; \
+    fi && \
+    chmod +x bazelisk-linux-* && \
+    mv bazelisk-linux-* /usr/local/bin/bazel
 
 RUN pip3 install Flask
 RUN pip3 install plotly

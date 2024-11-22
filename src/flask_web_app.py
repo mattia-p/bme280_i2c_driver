@@ -4,8 +4,15 @@ import plotly.graph_objs as go
 import plotly.io as pio
 import os
 
-app = Flask(__name__, template_folder=os.path.join(os.path.dirname(__file__), '../templates'))
-DATABASE_PATH = os.path.join(os.path.dirname(__file__), '../database/sensor_data.db')
+app = Flask(__name__, template_folder='/app/templates')  # If templates are directly inside /app/templates
+
+# Use the RUNFILES_DIR environment variable to get the correct runfiles path
+runfiles_dir = os.environ.get('RUNFILES_DIR', '')
+if not runfiles_dir:
+    # If RUNFILES_DIR is not set, fallback to the default location (adjust based on your setup)
+    runfiles_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../database'))
+
+DATABASE_PATH = "/app/database/sensor_data.db"
 
 def get_temperature_data():
     """

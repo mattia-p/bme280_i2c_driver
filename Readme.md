@@ -44,13 +44,13 @@ ps -a
 
 To kill all child processes at once:
 ```bash
-pkill -p < start_script_pid >
+pkill -P < start_script_pid >
 ```
 
 ## Improvements
 - Turn off sensor in between measurements?
 - Measure power consumption?
-- Error handling (sensor now found ...)
+- Error handling (sensor now found ...), app error...
 - Formatting (clang...)
 - CMake instead of g++
 - Memory management/handling
@@ -61,6 +61,7 @@ pkill -p < start_script_pid >
 - Handle UTC time in database
 - Add logging and remove print statements
 - Add diagram
+- Handle db memory?
 
 ## Result example
 
