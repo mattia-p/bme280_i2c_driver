@@ -5,8 +5,8 @@
 # Database files
 *.db
 
-# C++ executable
-cpp_driver
-
 # Bazel output folder
 bazel-*
+
+# Vscode
+.vscode/

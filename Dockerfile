@@ -15,6 +15,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     software-properties-common \
     gnupg \
+    libgtest-dev \
+    wget \
     apt-transport-https && \
     apt-get clean
 

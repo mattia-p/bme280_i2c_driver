@@ -1,46 +1,13 @@
-#include <iostream> // cin, cout, cerr
-#include <fcntl.h> // File control operations, open...
-#include <unistd.h> // Work with files and hardware devices (read, write, close)
-#include <sys/ioctl.h> // ioctl, IO control
-#include <linux/i2c-dev.h> // I2c 
+#include "bme280_cpp_driver.h"
+
 #include <cstdint> // For uint_8_t ...
-#include <sstream> // For std::ostringstream
-#include <sys/stat.h> // For mkfifo() and stat()
 #include <cstdio> // For perror()
-#include <unistd.h>    // For unlink()
-
-// BME280 default I2C address
-#define BME280_ADDRESS 0x77
-
-// BME280 Registers
-#define BME280_REG_TEMP_MSB 0xFA
-#define BME280_REG_TEMP_LSB 0xFB
-#define BME280_REG_TEMP_XLSB 0xFC
-#define BME280_REG_CTRL_HUM 0xF2
-#define BME280_REG_CTRL_MEAS 0xF4
-#define BME280_REG_CONFIG 0xF5
-
-#define PIPE_NAME "/tmp/sensor_pipe"  // Path for the named pipe
-
-class BME280
-{
-public:
-    BME280(const char* i2cDevice, uint8_t address);
-    bool begin();
-    float readTemperature();
-
-private:
-    int i2cFile; // File descriptor
-    uint8_t i2cAddress;
-    int32_t readRawTemperature();
-
-    // Helper functions
-    void writeRegister(uint8_t reg, uint8_t value);
-    uint8_t readRegister(uint8_t reg);
-    uint16_t read16(uint8_t reg);
-    uint32_t read20(uint8_t reg);
-    float compensateTemperature(int32_t rawTemp);
-};
+#include <fcntl.h> // File control operations, open...
+#include <iostream> // cin, cout, cerr
+#include <linux/i2c-dev.h> // I2c 
+#include <sstream> // For std::ostringstream
+#include <sys/ioctl.h> // ioctl, IO control
+#include <unistd.h> // Work with files and hardware devices (read, write, close)
 
 BME280::BME280(const char* i2cDevice, uint8_t address) : i2cAddress(address){
     
@@ -175,52 +142,4 @@ uint32_t BME280::read20(uint8_t reg){
     }
 
     return (buffer[0] << 16 | buffer[1] << 8 | buffer[2]);
-}
-
-int main()
-{
-    BME280 sensor("/dev/i2c-1", BME280_ADDRESS);
-
-    if (!sensor.begin())
-    {
-        std::cerr << "Failed to initialize BME280\n";
-        return 1;
-    }
-
-    // Check if the named pipe exists before creating it
-    struct stat st;
-    if(stat(PIPE_NAME, &st) != 0){
-        // Create the named pipe (FIFO) if it doesn't exist
-        if(mkfifo(PIPE_NAME, 0666) == -1){ // Create a named pipe at the path /tmp/sensor_pipe with read/write permissions
-            perror("mkfifo failed");
-            return 1;
-        }
-    }
-
-    // Open the pipe for writing
-    int pipe_fd = open(PIPE_NAME, O_WRONLY); // Will block until a reader is available
-    if (pipe_fd == -1){
-        perror("Failed to open pipe for writing");
-        return 1;
-    }
-
-    std::cout << "Begin loop" << std::endl;
-
-    while (true){
-        // Read temperature from the sensor
-        float temperature = sensor.readTemperature();
-
-        // Write the temperature to the pipe
-        if (write(pipe_fd, &temperature, sizeof(temperature)) == -1) {
-            perror("Failed to write to pipe");
-            break;
-        }
-
-        std::cout << "Send temperature: " << temperature << " °C\n";
-        sleep(1); // Send data every second
-    }
-
-    close(pipe_fd); // Close the pipe when done
-
-    return 0;
 }

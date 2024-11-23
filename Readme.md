@@ -10,24 +10,26 @@ sudo i2cdetect -y 1
 ### Build
 
 ```bash
-g++ -o cpp_driver bme280_cpp_driver.cpp
+bazel build //src/cpp_driver:bme280_cpp_driver_executable
+bazel build //src:main
+bazel build //src:flask_web_app
 ```
 
 ### Start
 
 Start the C++ i2c driver
 ```bash
-./cpp_driver
+bazel run //src/cpp_driver:bme280_cpp_driver_executable &
 ```
 
 Start the python main file:
 ```bash
-python3 main.py
+bazel run //src:main &
 ```
 
 Start the flask app:
 ```bash
-python3 flask_web_app.py
+bazel run //src:flask_web_app
 ```
 
 ### Run and stop all scripts at the same time
@@ -62,6 +64,7 @@ pkill -P < start_script_pid >
 - Add logging and remove print statements
 - Add diagram
 - Handle db memory?
+- Autocomplete
 
 ## Result example
 

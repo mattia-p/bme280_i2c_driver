@@ -11,7 +11,7 @@ set -m
 trap "kill 0" SIGINT SIGTERM
 
 # Build files
-bazel build //src/cpp_driver:bme280_cpp_driver
+bazel build //src/cpp_driver:bme280_cpp_driver_executable
 bazel build //src:main
 bazel build //src:flask_web_app
 
@@ -21,7 +21,7 @@ bazel build //src:flask_web_app
 
 # Start the C++ driver in the background
 # ./../src/cpp_driver/cpp_driver &
-bazel run //src/cpp_driver:bme280_cpp_driver &
+bazel run //src/cpp_driver:bme280_cpp_driver_executable &
 bazel run //src:main &
 bazel run //src:flask_web_app
 
