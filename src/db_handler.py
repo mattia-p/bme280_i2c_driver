@@ -4,13 +4,7 @@ import os
 import pytz
 import datetime
 
-# Dynamically get the runfiles directory
-RUNFILES_DIR = os.getenv('RUNFILES_DIR', None)
-if RUNFILES_DIR:
-    DATABASE_PATH = os.path.join(RUNFILES_DIR, 'bazel-out/aarch64-fastbuild/bin/src/flask_web_app.runfiles/_main/database/sensor_data.db')
-else:
-    # Fallback for non-bazel environments (e.g., local testing)
-    DATABASE_PATH = os.path.join(os.path.dirname(__file__), '../database/sensor_data.db')
+DATABASE_PATH = os.path.join(os.path.dirname(__file__), '../database/sensor_data.db')
 
 def init_db():
     """

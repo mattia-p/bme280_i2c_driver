@@ -5,8 +5,8 @@
 # Database files
 *.db
 
-# Bazel output folder
-bazel-*
-
 # Vscode
 .vscode/
+
+# Cmake build folder
+build/

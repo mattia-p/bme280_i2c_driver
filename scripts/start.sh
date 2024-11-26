@@ -10,28 +10,41 @@ set -m
 # SIGTERM: Termination signal to gracefully stop a process
 trap "kill 0" SIGINT SIGTERM
 
-# Build files
-bazel build //src/cpp_driver:bme280_cpp_driver_executable
-bazel build //src:main
-bazel build //src:flask_web_app
+# Get the current directory of the project
+PROJECT_ROOT=$(dirname "$PWD")
+echo $PROJECT_ROOT
 
-# Build the cpp driver
-# g++ -o ../src/cpp_driver/cpp_driver ../src/cpp_driver/bme280_cpp_driver.cpp
-# bazel build //src/cpp_driver:bme280_cpp_driver
+# Create a build directory in the project root if it doesn't exist
+BUILD_DIR="$PROJECT_ROOT/build"
+echo $BUILD_DIR
+if [ ! -d "$BUILD_DIR" ]; then
+  mkdir "$BUILD_DIR"
+fi
 
-# Start the C++ driver in the background
-# ./../src/cpp_driver/cpp_driver &
-bazel run //src/cpp_driver:bme280_cpp_driver_executable &
-bazel run //src:main &
-bazel run //src:flask_web_app
+cd $BUILD_DIR
 
+# Configure with cmake
+cmake ..
 
+# Build project
+make
+
+EXECUTABLE="$BUILD_DIR/bme280_cpp_driver_executable"
+
+# Check if the executable exists before running
+if [ -f "$EXECUTABLE" ]; then
+    # Run the C++ executable
+    "$EXECUTABLE" &
+else
+    echo "Error: Executable not found at $EXECUTABLE"
+fi
 
 # Start the Python script that logs temperature data to the database
-# python3 ../src/main.py &
+cd $PROJECT_ROOT
+python3 src/main.py &
 
 # Start the Flask web app
-# python3 ../src/flask_web_app.py
+python3 src/flask_web_app.py
 
 # Wait for all child processes
 wait
