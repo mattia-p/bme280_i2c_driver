@@ -14,6 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     g++ \
     build-essential \
     curl \
+    vim \
     software-properties-common \
     gnupg \
     libgtest-dev \
